@@ -10,7 +10,6 @@ import { usePublicSession } from '@/components/PublicSessionProvider'
 const baseLinks = [
   { href: '/', label: 'Acasă' },
   { href: '/#trasee', label: 'Trasee' },
-  { href: '/plata-online', label: 'Plată online' },
   { href: '/contact', label: 'Contact' },
 ]
 
