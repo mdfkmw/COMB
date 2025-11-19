@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 import PublicSessionProvider from '@/components/PublicSessionProvider'
+import SiteFooter from '@/components/SiteFooter'
 
 export const metadata: Metadata = {
   title: 'PRIS COM',
@@ -15,7 +16,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ro">
       <body>
-        <PublicSessionProvider>{children}</PublicSessionProvider>
+        <PublicSessionProvider>
+          {children}
+          <SiteFooter />
+        </PublicSessionProvider>
       </body>
     </html>
   )
