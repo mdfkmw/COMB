@@ -1,23 +1,10 @@
 import Link from 'next/link'
 import CardBrandLogos from './CardBrandLogos'
-
-const operatorDetails = [
-  {
-    name: 'SC PRIS COM UNIVERS SRL',
-    cui: 'CUI 4584735',
-    reg: 'J07/842/11.08.1993',
-    address: 'Str. Principală, Flămânzi, jud. Botoșani, România',
-  },
-  {
-    name: 'SC AUTO DIMAS SRL',
-    cui: 'CUI RO14327313',
-    reg: 'J2001001104227',
-    address: 'Șos. Moara de Foc nr. 15A, Iași, România',
-  },
-]
+import { operatorDetails } from '@/lib/companyInfo'
 
 const policyLinks = [
-  { href: '/plata-online', label: 'Plată online & Termeni' },
+  { href: '/termeni-si-conditii', label: 'Termeni și condiții' },
+  { href: '/politica-confidentialitate', label: 'Politica cookies/confidențialitate/reclamații' },
   { href: '/contact', label: 'Contact' },
 ]
 
@@ -59,7 +46,7 @@ export default function SiteFooter() {
             ))}
             <li>
               <a
-                href="https://anpc.ro/ce-este-sal/"
+                href="https://reclamatiisal.anpc.ro/"
                 target="_blank"
                 rel="noreferrer"
                 className="hover:text-brand"
