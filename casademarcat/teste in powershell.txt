@@ -1,0 +1,32 @@
+# NEFISCAL pe casa A (COM5)
+Invoke-WebRequest -Uri "http://localhost:9000/nf/open?dev=A"  -Method POST -ContentType "application/json" -Body '{}' | % Content
+Invoke-WebRequest -Uri "http://localhost:9000/nf/text?dev=A"  -Method POST -ContentType "application/json" -Body '{"text":"Test nefiscal A"}' | % Content
+Invoke-WebRequest -Uri "http://localhost:9000/nf/close?dev=A" -Method POST -ContentType "application/json" -Body '{}' | % Content
+
+# FISCAL pe casa B (COM5)
+Invoke-WebRequest -Uri "http://localhost:9000/fiscal/open?dev=A" -Method POST -ContentType "application/json" -Body '{"operator":"30","password":"0030","till":"1"}' | % Content
+Invoke-WebRequest -Uri "http://localhost:9000/fiscal/sale?dev=A" -Method POST -ContentType "application/json" -Body '{"name":"Produs test","tax":"1","price":"0.10","quantity":"1.000","department":"1","unit":"BUC"}' | % Content
+Invoke-WebRequest -Uri "http://localhost:9000/fiscal/pay?dev=A"  -Method POST -ContentType "application/json" -Body '{"mode":"cash","amount":"0.10"}' | % Content
+Invoke-WebRequest -Uri "http://localhost:9000/fiscal/close?dev=A" -Method POST | % Content
+
+
+
+
+# NEFISCAL pe casa B (COM6)
+Invoke-WebRequest -Uri "http://localhost:9000/nf/open?dev=B"  -Method POST -ContentType "application/json" -Body '{}' | % Content
+Invoke-WebRequest -Uri "http://localhost:9000/nf/text?dev=B"  -Method POST -ContentType "application/json" -Body '{"text":"Test nefiscal A"}' | % Content
+Invoke-WebRequest -Uri "http://localhost:9000/nf/close?dev=B" -Method POST -ContentType "application/json" -Body '{}' | % Content
+
+# FISCAL pe casa B (COM6)
+Invoke-WebRequest -Uri "http://localhost:9000/fiscal/open?dev=B" -Method POST -ContentType "application/json" -Body '{"operator":"30","password":"0030","till":"1"}' | % Content
+Invoke-WebRequest -Uri "http://localhost:9000/fiscal/sale?dev=B" -Method POST -ContentType "application/json" -Body '{"name":"Produs test","tax":"1","price":"0.10","quantity":"1.000","department":"1","unit":"BUC"}' | % Content
+Invoke-WebRequest -Uri "http://localhost:9000/fiscal/pay?dev=B"  -Method POST -ContentType "application/json" -Body '{"mode":"cash","amount":"0.10"}' | % Content
+Invoke-WebRequest -Uri "http://localhost:9000/fiscal/close?dev=B" -Method POST | % Content
+
+
+
+
+npm i express serialport
+$env:HTTP_PORT="9000"; $env:DEFAULT_BAUD="115200"; `
+$env:DEV_A_PORT="COM5"; $env:DEV_B_PORT="COM6"
+node .\server-multi-device.js
