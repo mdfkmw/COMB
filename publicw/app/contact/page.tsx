@@ -1,4 +1,5 @@
 import Navbar from '@/components/Navbar'
+import { operatorDetails, productsAndServices } from '@/lib/companyInfo'
 
 export const metadata = {
   title: 'Contact - Pris Com',
@@ -66,6 +67,29 @@ export default function ContactPage() {
             <p className="text-xs text-white/50">
               Programul agențiilor poate varia în funcție de sezon. Pentru confirmări rapide, recomandăm apelarea directă a agenției.
             </p>
+          </div>
+        </section>
+
+        <section className="grid gap-6 rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur md:grid-cols-2">
+          <div>
+            <h2 className="text-lg font-semibold">Operatori și date de identificare</h2>
+            <ul className="mt-4 space-y-4 text-sm text-white/70">
+              {operatorDetails.map((operator) => (
+                <li key={operator.name}>
+                  <p className="font-semibold text-white">{operator.name}</p>
+                  <p>{operator.cui} • {operator.reg}</p>
+                  <p>{operator.address}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold">Produse și servicii comercializate</h2>
+            <ul className="mt-4 list-disc space-y-2 pl-5 text-sm text-white/70">
+              {productsAndServices.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
           </div>
         </section>
       </div>
