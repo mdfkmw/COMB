@@ -25,8 +25,6 @@ const SeatMap = forwardRef(function SeatMap({
   driverName = '',
   intentHolds = {},
   isWideView = false,
-  wideSeatSize = { width: 260, height: 150 },
-  showObservations = false,
 }, ref) {
 
 
@@ -45,8 +43,8 @@ const SeatMap = forwardRef(function SeatMap({
 
 
 
-  const seatWidth = isWideView ? wideSeatSize?.width || 260 : 105;
-  const seatHeight = isWideView ? wideSeatSize?.height || 150 : 100;
+
+  const seatWidth = isWideView ? 210 : 105;
   const maxCol = seats.length > 0 ? Math.max(...seats.map(s => s.seat_col || 1)) : 1;
   const maxRow = seats.length > 0 ? Math.max(...seats.map(s => s.row || 1)) : 1;
 
@@ -58,8 +56,8 @@ const SeatMap = forwardRef(function SeatMap({
       className="relative mx-auto"
       style={{
         display: "grid",
-        gridTemplateColumns: `repeat(${maxCol}, ${seatWidth}px)`,   // lățimea locului se ajustează după modul de vizualizare
-        gridTemplateRows: `repeat(${maxRow + 1}, ${seatHeight}px)`,
+        gridTemplateColumns: `repeat(${maxCol}, ${seatWidth}px)`,   // fiecare seat are 105px
+        gridTemplateRows: `repeat(${maxRow + 1}, 100px)`,
         gap: "5px",
         background: "#f3f4f6",
         padding: 16,
@@ -166,15 +164,13 @@ const SeatMap = forwardRef(function SeatMap({
               gridRowStart: seat.row + 1,
               gridColumnStart: seat.seat_col,
               width: `${seatWidth}px`,
-              height: `${seatHeight}px`,
+              height: '100px',
             }}
           >
-            <div className="flex justify-between items-start font-semibold text-[13px] leading-tight mb-1">
+            <div className="flex justify-between font-semibold text-[13px] leading-tight mb-1">
               <span className="truncate">{seatTitle}</span>
-              {activePassengers.length > 0 && (
-                <span className="text-[11px] px-2 py-1 rounded bg-white/20 text-right">
-                  {activePassengers.length} pas.
-                </span>
+              {activePassengers[0] && (
+                <span className="truncate">{activePassengers[0].name || '(fără nume)'}</span>
               )}
             </div>
 
@@ -184,25 +180,15 @@ const SeatMap = forwardRef(function SeatMap({
               </div>
             )}
 
-            {activePassengers.length > 0 && (
-              <div className="flex flex-col items-end text-right gap-1 text-[11px] leading-tight">
-                {activePassengers.map((p, i) => (
-                  <div key={i} className="w-full">
-                    <div className="font-semibold text-[12px] leading-tight truncate">{p.name || '(fără nume)'}</div>
-                    <div>{p.phone}</div>
-                    <div className="italic">{p.board_at} → {p.exit_at}</div>
-                    {showObservations && p.observations && (
-                      <div className="mt-0.5 text-[10px] text-white/90 italic text-right whitespace-pre-line">
-                        📝 {p.observations}
-                      </div>
-                    )}
-                  </div>
-                ))}
+            {activePassengers[0] && (
+              <div className="text-[11px] leading-tight">
+                <div>{activePassengers[0].phone}</div>
+                <div className="italic">{activePassengers[0].board_at} → {activePassengers[0].exit_at}</div>
               </div>
             )}
 
             {activePassengers[0]?.payment_method && (
-              <div className="mt-1 flex justify-end">
+              <div className="mt-1">
                 <span className={`inline-block px-2 py-1 rounded text-xs font-semibold
       ${activePassengers[0].payment_method === 'cash'
                     ? 'bg-yellow-500 text-white'
@@ -218,6 +204,18 @@ const SeatMap = forwardRef(function SeatMap({
                     return '📝 Rezervare';
                   })()}
                 </span>
+              </div>
+            )}
+
+            {activePassengers.length > 1 && (
+              <div className="mt-1 text-[11px] leading-tight">
+                {activePassengers.slice(1).map((p, i) => (
+                  <div key={i} className="mt-1">
+                    <div className="font-semibold">{p.name}</div>
+                    <div>{p.phone}</div>
+                    <div className="italic">{p.board_at} → {p.exit_at}</div>
+                  </div>
+                ))}
               </div>
             )}
 
