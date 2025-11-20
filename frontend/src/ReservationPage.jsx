@@ -614,6 +614,10 @@ export default function ReservationPage({ userRole, user }) {
   const [saveMessage, setSaveMessage] = useState('');
   // ✏️ Control pentru afișarea/ascunderea observațiilor per loc
   const [notesVisibility, setNotesVisibility] = useState({});
+  // ⚙️ Control pentru dimensiunile locurilor în modul lat
+  const [wideSeatSize, setWideSeatSize] = useState({ width: 260, height: 150 });
+  // 📝 Afișare observații direct pe diagramă
+  const [showSeatObservations, setShowSeatObservations] = useState(false);
   // 🚐 Control pentru afișarea popup-ului de alegere vehicul
   const [showVehiclePopup, setShowVehiclePopup] = useState(false);
   // 🚌 Lista vehiculelor disponibile încărcată din backend
@@ -661,6 +665,17 @@ export default function ReservationPage({ userRole, user }) {
     }
   }, [seatViewMode, isWideView]);
 
+  const adjustWideSeatSize = useCallback((dimension, delta) => {
+    setWideSeatSize((prev) => {
+      const limits = dimension === 'width'
+        ? { min: 160, max: 360 }
+        : { min: 120, max: 260 };
+      const nextValue = Math.min(limits.max, Math.max(limits.min, prev[dimension] + delta));
+      if (nextValue === prev[dimension]) return prev;
+      return { ...prev, [dimension]: nextValue };
+    });
+  }, []);
+
   const [popupPassenger, setPopupPassenger] = useState(null);
   const [popupSeat, setPopupSeat] = useState(null);
   const [popupPosition, setPopupPosition] = useState(null);
@@ -680,8 +695,8 @@ export default function ReservationPage({ userRole, user }) {
       return null;
     }
 
-    const seatWidth = isWideView ? 210 : 105;
-    const seatHeight = 100;
+    const seatWidth = isWideView ? wideSeatSize.width : 105;
+    const seatHeight = isWideView ? wideSeatSize.height : 100;
     const seatGap = 5;
     const padding = 24;
     const seatPadding = 10;
@@ -878,6 +893,7 @@ export default function ReservationPage({ userRole, user }) {
     selectedHour,
     selectedRoute?.name,
     selectedSeats,
+    wideSeatSize,
   ]);
 
   const handleSeatMapExport = useCallback(
@@ -4154,6 +4170,15 @@ export default function ReservationPage({ userRole, user }) {
                     </button>
                   </div>
                   <div className="inline-flex items-center gap-2 flex-wrap ml-auto">
+                    <label className="inline-flex items-center gap-2 text-xs font-semibold text-gray-700">
+                      <input
+                        type="checkbox"
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        checked={showSeatObservations}
+                        onChange={(e) => setShowSeatObservations(e.target.checked)}
+                      />
+                      Observații pe diagramă
+                    </label>
                     <button
                       type="button"
                       onClick={() => handleSeatMapExport(currentDriverName)}
@@ -4176,35 +4201,94 @@ export default function ReservationPage({ userRole, user }) {
                   </div>
                 )}
                 {seats.length > 0 && seatViewMode === 'grid' && (
-                  <SeatMap
-                    ref={seatMapRef}
-                    seats={seats}
-                    stops={stops}
-                    selectedSeats={selectedSeats}
-                    setSelectedSeats={setSelectedSeats}
-                    moveSourceSeat={moveSourceSeat}
-                    setMoveSourceSeat={setMoveSourceSeat}
-                    popupPassenger={popupPassenger}
-                    setPopupPassenger={setPopupPassenger}
-                    popupSeat={popupSeat}
-                    setPopupSeat={setPopupSeat}
-                    popupPosition={popupPosition}
-                    setPopupPosition={setPopupPosition}
-                    handleMovePassenger={handleMovePassenger}
-                    handleSeatClick={handleSeatClick}
-                    toggleSeat={toggleSeat}
-                    isSeatFullyOccupiedViaSegments={isSeatFullyOccupiedViaSegments}
-                    checkSegmentOverlap={checkSegmentOverlap}
-                    selectedRoute={selectedRoute}
-                    setToastMessage={setToastMessage}
-                    setToastType={setToastType}
-                    driverName={currentDriverName}
-                    intentHolds={intentHolds}
-                    vehicleId={
-                      tabs.find(tv => tv.trip_vehicle_id === activeTv)?.vehicle_id
-                    }
-                    isWideView={isWideView}
-                  />
+                  <div className="relative inline-block w-full">
+                    {isWideView && (
+                      <div className="absolute -top-2 left-1/2 -translate-x-1/2 z-20 bg-white border border-gray-200 shadow-lg rounded-lg px-4 py-3 flex flex-col items-center gap-2">
+                        <div className="text-[11px] font-semibold text-gray-700 uppercase tracking-wide">Dimensiune locuri</div>
+                        <div className="grid grid-cols-3 gap-1">
+                          <div />
+                          <button
+                            type="button"
+                            onClick={() => adjustWideSeatSize('height', 10)}
+                            className="w-8 h-8 flex items-center justify-center rounded bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100"
+                            title="Mărește înălțimea locurilor"
+                            aria-label="Mărește înălțimea locurilor"
+                          >
+                            +
+                          </button>
+                          <div />
+                          <button
+                            type="button"
+                            onClick={() => adjustWideSeatSize('width', -10)}
+                            className="w-8 h-8 flex items-center justify-center rounded bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100"
+                            title="Micșorează lățimea locurilor"
+                            aria-label="Micșorează lățimea locurilor"
+                          >
+                            −
+                          </button>
+                          <div className="flex items-center justify-center text-[10px] font-semibold text-gray-700 bg-gray-100 rounded px-2 py-1">
+                            {wideSeatSize.width}×{wideSeatSize.height}
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => adjustWideSeatSize('width', 10)}
+                            className="w-8 h-8 flex items-center justify-center rounded bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100"
+                            title="Mărește lățimea locurilor"
+                            aria-label="Mărește lățimea locurilor"
+                          >
+                            +
+                          </button>
+                          <div />
+                          <button
+                            type="button"
+                            onClick={() => adjustWideSeatSize('height', -10)}
+                            className="w-8 h-8 flex items-center justify-center rounded bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100"
+                            title="Micșorează înălțimea locurilor"
+                            aria-label="Micșorează înălțimea locurilor"
+                          >
+                            −
+                          </button>
+                          <div />
+                        </div>
+                        <div className="text-[10px] text-gray-600 text-center leading-tight">
+                          Folosește butoanele de tip cruce pentru a ajusta lățimea și înălțimea locurilor în modul "Vedere largă".
+                        </div>
+                      </div>
+                    )}
+                    <div className={`overflow-auto ${isWideView ? 'pt-16' : ''}`}>
+                      <SeatMap
+                        ref={seatMapRef}
+                        seats={seats}
+                        stops={stops}
+                        selectedSeats={selectedSeats}
+                        setSelectedSeats={setSelectedSeats}
+                        moveSourceSeat={moveSourceSeat}
+                        setMoveSourceSeat={setMoveSourceSeat}
+                        popupPassenger={popupPassenger}
+                        setPopupPassenger={setPopupPassenger}
+                        popupSeat={popupSeat}
+                        setPopupSeat={setPopupSeat}
+                        popupPosition={popupPosition}
+                        setPopupPosition={setPopupPosition}
+                        handleMovePassenger={handleMovePassenger}
+                        handleSeatClick={handleSeatClick}
+                        toggleSeat={toggleSeat}
+                        isSeatFullyOccupiedViaSegments={isSeatFullyOccupiedViaSegments}
+                        checkSegmentOverlap={checkSegmentOverlap}
+                        selectedRoute={selectedRoute}
+                        setToastMessage={setToastMessage}
+                        setToastType={setToastType}
+                        driverName={currentDriverName}
+                        intentHolds={intentHolds}
+                        vehicleId={
+                          tabs.find(tv => tv.trip_vehicle_id === activeTv)?.vehicle_id
+                        }
+                        isWideView={isWideView}
+                        wideSeatSize={wideSeatSize}
+                        showObservations={showSeatObservations}
+                      />
+                    </div>
+                  </div>
                 )}
 
 
