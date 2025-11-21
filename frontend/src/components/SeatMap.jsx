@@ -44,10 +44,8 @@ const SeatMap = forwardRef(function SeatMap({
 
 
 
-  const seatWidth = isWideView ? 320 : 105;
-  const seatHeight = isWideView ? 190 : 100;
-  const seatPadding = isWideView ? 'p-3' : 'p-2';
-  const alignmentClass = isWideView ? 'text-right items-end' : 'text-left';
+  const seatWidth = isWideView ? 260 : 105;
+  const seatHeight = isWideView ? 150 : 100;
   const maxCol = seats.length > 0 ? Math.max(...seats.map(s => s.seat_col || 1)) : 1;
   const maxRow = seats.length > 0 ? Math.max(...seats.map(s => s.row || 1)) : 1;
 
@@ -158,10 +156,10 @@ const SeatMap = forwardRef(function SeatMap({
                 toggleSeat(seat);
               }
             }}
-            className={`relative text-white text-xs md:text-sm ${alignmentClass} rounded cursor-pointer flex flex-col justify-start ${seatPadding} transition overflow-hidden ${baseColorClass}
+            className={`relative text-white text-xs md:text-sm text-left rounded cursor-pointer flex flex-col justify-start p-2 transition overflow-hidden ${baseColorClass}
   ${isSelected ? 'animate-pulse ring-2 ring-white' : ''}
   ${moveSourceSeat?.id === seat.id ? 'ring-4 ring-yellow-400' : ''}
-  `}
+`}
 
             style={{
               gridRowStart: seat.row + 1,
@@ -169,61 +167,59 @@ const SeatMap = forwardRef(function SeatMap({
               width: `${seatWidth}px`,
               height: `${seatHeight}px`,
             }}
-            >
-              <div className={`flex items-start font-semibold text-[13px] leading-tight mb-2 ${
-                isWideView ? 'justify-end gap-2 flex-wrap text-right' : 'justify-between'
-              }`}>
-                <span className="truncate">{seatTitle}</span>
-                {activePassengers.length > 0 && (
-                  <span className="text-[11px] px-2 py-1 rounded bg-white/20 text-right whitespace-nowrap">
-                    {activePassengers.length} pas.
-                  </span>
-                )}
+          >
+            <div className="flex justify-between items-start font-semibold text-[13px] leading-tight mb-1">
+              <span className="truncate">{seatTitle}</span>
+              {activePassengers.length > 0 && (
+                <span className="text-[11px] px-2 py-1 rounded bg-white/20 text-right">
+                  {activePassengers.length} pas.
+                </span>
+              )}
+            </div>
+
+            {isDriver && driverName && (
+              <div className="text-[11px] uppercase tracking-wide text-white/80 -mt-1 mb-1">
+                Șofer
               </div>
+            )}
 
-                {isDriver && driverName && (
-                  <div className="text-[11px] uppercase tracking-wide text-white/80 -mt-1 mb-1">
-                    Șofer
+            {activePassengers.length > 0 && (
+              <div className="flex flex-col items-end text-right gap-1 text-[11px] leading-tight">
+                {activePassengers.map((p, i) => (
+                  <div key={i} className="w-full">
+                    <div className="font-semibold text-[12px] leading-tight truncate">{p.name || '(fără nume)'}</div>
+                    <div>{p.phone}</div>
+                    <div className="italic">{p.board_at} → {p.exit_at}</div>
                   </div>
-                )}
+                ))}
+              </div>
+            )}
 
-                {activePassengers.length > 0 && (
-                  <div className="flex flex-col items-end text-right gap-1 text-[11px] leading-tight w-full">
-                    {activePassengers.map((p, i) => (
-                      <div key={i} className="w-full space-y-0.5">
-                        <div className="font-semibold text-[12px] leading-tight truncate">{p.name || '(fără nume)'}</div>
-                        <div className="text-[11px]">{p.phone}</div>
-                        <div className="italic text-[11px]">{p.board_at} → {p.exit_at}</div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+            {activePassengers[0]?.payment_method && (
+              <div className="mt-1 flex justify-end">
+                <span className={`inline-block px-2 py-1 rounded text-xs font-semibold
+      ${activePassengers[0].payment_method === 'cash'
+                    ? 'bg-yellow-500 text-white'
+                    : activePassengers[0].payment_method === 'card'
+                      ? 'bg-purple-600 text-white'
+                      : 'bg-gray-400 text-white'}`}
+                >
+                  {(() => {
+                    const paid = activePassengers.find(p => p?.payment_status === 'paid');
+                    const pm = paid?.payment_method || activePassengers[0]?.payment_method;
+                    if (pm === 'cash') return '💵 Cash';
+                    if (pm === 'card') return '💳 Card';
+                    return '📝 Rezervare';
+                  })()}
+                </span>
+              </div>
+            )}
 
-                {activePassengers[0]?.payment_method && (
-                  <div className="mt-1 flex justify-end">
-                    <span className={`inline-block px-2 py-1 rounded text-xs font-semibold
-          ${activePassengers[0].payment_method === 'cash'
-                        ? 'bg-yellow-500 text-white'
-                        : activePassengers[0].payment_method === 'card'
-                          ? 'bg-purple-600 text-white'
-                          : 'bg-gray-400 text-white'}`}
-                    >
-                      {(() => {
-                        const paid = activePassengers.find(p => p?.payment_status === 'paid');
-                        const pm = paid?.payment_method || activePassengers[0]?.payment_method;
-                        if (pm === 'cash') return '💵 Cash';
-                        if (pm === 'card') return '💳 Card';
-                        return '📝 Rezervare';
-                      })()}
-                    </span>
-                  </div>
-                )}
-
-                {heldByOther && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-45 text-[11px] font-semibold uppercase">
-                    Rezervare în curs
-                  </div>
-                )}
+            {heldByOther && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-45 text-[11px] font-semibold uppercase">
+                Rezervare în curs
+              </div>
+            )}
 
 
           </div>
