@@ -825,6 +825,10 @@ export default function ReservationPage({ userRole, user }) {
         writeLine(primaryPassenger.name || '(fără nume)', '600 13px "Inter", sans-serif');
         writeLine(primaryPassenger.phone, '12px "Inter", sans-serif');
         writeLine(`${primaryPassenger.board_at} → ${primaryPassenger.exit_at}`, '12px "Inter", sans-serif');
+        const primaryObservation = (primaryPassenger.observations || '').trim();
+        if (primaryObservation) {
+          writeLine(`📝 ${primaryObservation}`, 'italic 11px "Inter", sans-serif');
+        }
       }
 
       if (activePassengers.length > 1) {
@@ -832,6 +836,10 @@ export default function ReservationPage({ userRole, user }) {
         activePassengers.slice(1).forEach((passenger) => {
           writeLine(passenger.name, '600 12px "Inter", sans-serif');
           writeLine(passenger.phone, '12px "Inter", sans-serif');
+          const observation = (passenger.observations || '').trim();
+          if (observation) {
+            writeLine(`📝 ${observation}`, 'italic 11px "Inter", sans-serif');
+          }
         });
       }
 
